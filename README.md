@@ -1,3 +1,5 @@
+## Everything is generated with A.I.
+
 # LINK
 ```
 https://prakash-aadi22.github.io/Games/
