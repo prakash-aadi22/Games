@@ -1,0 +1,147 @@
+<!-- pong.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Initial paddle positions
+        let leftPaddleY = canvas.height / 2 - 50;
+        let rightPaddleY = canvas.height / 2 - 50;
+
+        // Initial ball position and speed
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let dx = 5; // Ball speed along X-axis
+        let dy = 5; // Ball speed along Y-axis
+
+        // Paddle and ball dimensions
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const ballSize = 10;
+
+        // Initial scores
+        let leftScore = 0;
+        let rightScore = 0;
+
+        // Move paddles
+        function movePaddle(e) {
+            const mouseY = e.clientY - canvas.getBoundingClientRect().top - paddleHeight / 2;
+            if (mouseY >= 0 && mouseY <= canvas.height - paddleHeight) {
+                leftPaddleY = mouseY;
+            }
+        }
+
+        // Main game loop
+        function gameLoop() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw paddles
+            ctx.fillStyle = '#000'; // Paddle color
+            ctx.fillRect(10, leftPaddleY, paddleWidth, paddleHeight);
+            ctx.fillRect(canvas.width - 20, rightPaddleY, paddleWidth, paddleHeight);
+
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff0000'; // Ball color
+            ctx.fill();
+            ctx.closePath();
+
+            // Move the ball
+            ballX += dx;
+            ballY += dy;
+
+            // Ball collision with top and bottom walls
+            if (ballY + dy > canvas.height - ballSize || ballY + dy < ballSize) {
+                dy = -dy;
+            }
+
+            // Ball collision with paddles
+            if (
+                ballX + dx < 20 + paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight ||
+                ballX + dx > canvas.width - 30 - paddleWidth && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight
+            ) {
+                dx = -dx;
+            }
+
+            // Ball out of bounds - Right side
+            if (ballX + dx > canvas.width - ballSize) {
+                // Reset ball position
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                dx = -dx;
+                // Increment right player's score
+                rightScore++;
+            }
+
+            // Ball out of bounds - Left side
+            if (ballX + dx < ballSize) {
+                // Reset ball position
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                dx = -dx;
+                // Increment left player's score
+                leftScore++;
+            }
+
+            // Draw the scores
+            ctx.fillStyle = '#000';
+            ctx.font = '20px Arial';
+            ctx.fillText(`Left Player Score: ${leftScore}`, 20, 30);
+            ctx.fillText(`Right Player Score: ${rightScore}`, canvas.width - 220, 30);
+
+            // Continue the game loop
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Automatic movement of the right paddle
+        function moveRightPaddle() {
+            const ballCenter = ballY + ballSize / 2;
+            const paddleCenter = rightPaddleY + paddleHeight / 2;
+            if (ballCenter > paddleCenter) {
+                rightPaddleY += 5;
+            } else {
+                rightPaddleY -= 5;
+            }
+        }
+
+        // Event listener for mouse movement
+        document.addEventListener('mousemove', movePaddle);
+
+        // Initialize the game loop
+        setInterval(moveRightPaddle, 100); // Automatically move right paddle
+        gameLoop();
+    </script>
+</body>
+
+</html>

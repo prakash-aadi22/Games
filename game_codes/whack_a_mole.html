@@ -1,0 +1,90 @@
+<!-- whack_a_mole.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-a-Mole</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .mole {
+            width: 50px;
+            height: 50px;
+            background-color: #8b4513;
+            border-radius: 50%;
+            position: absolute;
+            display: none;
+        }
+
+        p#score {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Whack-a-Mole</h1>
+        <div id="gameArea">
+            <!-- Moles will appear here -->
+        </div>
+        <p id="score">Score: <span id="scoreValue">0</span></p>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const scoreValue = document.getElementById('scoreValue');
+        let score = 0;
+        let moleInterval;
+
+        function startGame() {
+            moleInterval = setInterval(createMole, 1000);
+        }
+
+        function createMole() {
+            const mole = document.createElement('div');
+            mole.className = 'mole';
+            mole.style.left = `${Math.random() * (gameArea.clientWidth - 50)}px`;
+            mole.style.top = `${Math.random() * (gameArea.clientHeight - 50)}px`;
+            gameArea.appendChild(mole);
+
+            mole.style.display = 'block'; // Ensure mole is displayed
+
+            mole.addEventListener('click', () => {
+                score++;
+                scoreValue.textContent = score;
+                gameArea.removeChild(mole);
+            });
+
+            setTimeout(() => {
+                gameArea.removeChild(mole);
+            }, 2000);
+        }
+
+        startGame();
+    </script>
+</body>
+
+</html>

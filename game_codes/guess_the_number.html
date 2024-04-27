@@ -1,0 +1,99 @@
+<!-- guess_the_number.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 200px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p#feedback {
+            margin-top: 10px;
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Number Guessing Game</h1>
+        <p>Guess a number between 1 and 10:</p>
+        <input type="text" id="guessField">
+        <br>
+        <button onclick="checkGuess()">Submit Guess</button>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        // Generate a random number between 1 and 10
+        const randomNumber = Math.floor(Math.random() * 10) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guessField').value);
+            const feedback = document.getElementById('feedback');
+
+            if (isNaN(guess) || guess < 1 || guess > 10) {
+                feedback.textContent = 'Please enter a valid number between 1 and 10.';
+                return;
+            }
+
+            attempts++;
+
+            if (guess === randomNumber) {
+                feedback.textContent = `Congratulations! You guessed the correct number (${randomNumber}) in ${attempts} attempts.`;
+            } else if (guess < randomNumber) {
+                feedback.textContent = 'Too low! Try again.';
+            } else {
+                feedback.textContent = 'Too high! Try again.';
+            }
+        }
+    </script>
+</body>
+
+</html>
