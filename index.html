@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,22 +17,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         .container {
             text-align: center;
+            width: 80%;
+            max-width: 800px;
+            margin: auto;
         }
 
         h1 {
             font-size: 2.5rem;
             color: #333;
+            margin-bottom: 20px;
         }
 
         .game-buttons {
-            margin-top: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 20px;
         }
 
@@ -43,12 +48,56 @@
             border-radius: 10px;
             cursor: pointer;
             font-size: 1.2rem;
-            transition: background-color 0.3s ease;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            position: relative;
         }
 
         .game-button:hover {
             background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .game-button i {
+            margin-right: 10px;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            width: 200px;
+        }
+
+        .game-button:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                width: 90%;
+            }
+        }
+
+        .game-button.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -58,15 +107,38 @@
     <div class="container">
         <h1><i>Choose a Game</i></h1>
         <div class="game-buttons">
-            <a href="game_codes/guess_the_number.html" class="game-button"><i>Guess the Number</i></a>
-            <a href="game_codes/memory_card_game.html" class="game-button"><i>Memory Card Game</i></a>
-            <a href="game_codes/pong.html" class="game-button"><i>Pong</i></a>
-            <a href="game_codes/rock_paper_scissors.html" class="game-button"><i>Rock Paper Scissors</i></a>
-            <a href="game_codes/snake.html" class="game-button"><i>Snake</i></a>
-            <a href="game_codes/tic_tac_toe.html" class="game-button"><i>Tic Tac Toe</i></a>
-            <a href="game_codes/whack_a_mole.html" class="game-button"><i>Whack-a-Mole</i></a>
+            <a href="game_codes/guess_the_number.html" id="guess-btn" class="game-button"><i
+                    class="fas fa-dice"></i>Guess the Number<span class="tooltip">Try to guess the correct number within
+                    a given range.</span></a>
+            <a href="game_codes/memory_card_game.html" id="memory-btn" class="game-button"><i
+                    class="fas fa-memory"></i>Memory Card Game<span class="tooltip">Match pairs of cards in the shortest
+                    time possible.</span></a>
+            <a href="game_codes/pong.html" id="pong-btn" class="game-button"><i
+                    class="fas fa-table-tennis"></i>Pong<span class="tooltip">Classic table tennis game.</span></a>
+            <a href="game_codes/rock_paper_scissors.html" id="rock-paper-btn" class="game-button"><i
+                    class="fas fa-hand-rock"></i>Rock Paper Scissors<span class="tooltip">Play the classic hand game
+                    against the computer.</span></a>
+            <a href="game_codes/snake.html" id="snake-btn" class="game-button"><i class="fas fa-square"></i>Snake<span
+                    class="tooltip">Control a snake to eat food and grow.</span></a>
+            <a href="game_codes/tic_tac_toe.html" id="tic-tac-toe-btn" class="game-button"><i
+                    class="fas fa-times"></i>Tic Tac Toe<span class="tooltip">Play the classic game of Tic Tac Toe
+                    against a friend or AI.</span></a>
+            <a href="game_codes/whack_a_mole.html" id="whack-mole-btn" class="game-button"><i
+                    class="fas fa-hammer"></i>Whack-a-Mole<span class="tooltip">Whack as many moles as you can in a
+                    limited time.</span></a>
         </div>
     </div>
+
+    <script>
+        window.onload = function () {
+            var buttons = document.querySelectorAll('.game-button');
+            buttons.forEach(function (button, index) {
+                setTimeout(function () {
+                    button.classList.add('animate');
+                }, index * 50);
+            });
+        };
+    </script>
 
 </body>
 
