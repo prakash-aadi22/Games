@@ -1,5 +1,3 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,11 +7,26 @@
     <title>Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+        :root {
+            --primary-color: #000000;
+            --hover-color: #45a049;
+            --text-color: #333;
+            --bg-color: #f0f0f0;
+            --tooltip-bg: #333;
+            --tooltip-text: white;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,32 +35,33 @@
 
         .container {
             text-align: center;
-            width: 80%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 1200px;
             margin: auto;
+            padding: 20px;
         }
 
         h1 {
-            font-size: 2.5rem;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: var(--text-color);
+            margin-bottom: 30px;
         }
 
         .game-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
+            width: 100%;
         }
 
         .game-button {
-            padding: 15px 30px;
-            background-color: #000000;
+            padding: clamp(12px, 3vw, 15px) clamp(20px, 4vw, 30px);
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -56,90 +70,201 @@
             opacity: 0;
             transform: translateY(10px);
             position: relative;
+            height: 60px;
         }
 
-        .game-button:hover {
-            background-color: #45a049;
+        .game-button:hover,
+        .game-button:focus {
+            background-color: var(--hover-color);
             transform: scale(1.05);
+            outline: none;
+        }
+
+        .game-button:active {
+            transform: scale(0.98);
         }
 
         .game-button i {
             margin-right: 10px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
         }
 
         .tooltip {
             visibility: hidden;
-            background-color: #333;
-            color: white;
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-text);
             text-align: center;
             border-radius: 6px;
             padding: 10px;
             position: absolute;
-            z-index: 1;
+            z-index: 10;
             bottom: 125%;
             left: 50%;
             transform: translateX(-50%);
             opacity: 0;
             transition: opacity 0.3s;
-            width: 200px;
+            width: max(200px, 90%);
+            font-size: 0.9rem;
+            pointer-events: none;
         }
 
-        .game-button:hover .tooltip {
+        /* Triangle pointer for tooltip */
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: var(--tooltip-bg) transparent transparent transparent;
+        }
+
+        .game-button:hover .tooltip,
+        .game-button:focus .tooltip {
             visibility: visible;
             opacity: 1;
-        }
-
-        @media screen and (max-width: 600px) {
-            .container {
-                width: 90%;
-            }
         }
 
         .game-button.animate {
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Media Queries */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .game-buttons {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            /* Adjust tooltip position for touch devices */
+            .tooltip {
+                width: 180px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                margin-bottom: 20px;
+            }
+
+            .game-buttons {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            /* Show tooltips on tap for mobile */
+            .game-button:active .tooltip {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            .game-button {
+                transition: none;
+            }
+
+            .game-button.animate {
+                opacity: 1;
+                transform: none;
+            }
+        }
     </style>
 </head>
 
 <body>
-
     <div class="container">
         <h1><i>Choose a Game</i></h1>
         <div class="game-buttons">
-            <a href="game_codes/guess_the_number.html" id="guess-btn" class="game-button"><i
-                    class="fas fa-dice"></i>Guess the Number<span class="tooltip">Try to guess the correct number within
-                    a given range.</span></a>
-            <a href="game_codes/memory_card_game.html" id="memory-btn" class="game-button"><i
-                    class="fas fa-memory"></i>Memory Card Game<span class="tooltip">Match pairs of cards in the shortest
-                    time possible.</span></a>
-            <a href="game_codes/pong.html" id="pong-btn" class="game-button"><i
-                    class="fas fa-table-tennis"></i>Pong<span class="tooltip">Classic table tennis game.</span></a>
-            <a href="game_codes/rock_paper_scissors.html" id="rock-paper-btn" class="game-button"><i
-                    class="fas fa-hand-rock"></i>Rock Paper Scissors<span class="tooltip">Play the classic hand game
-                    against the computer.</span></a>
-            <a href="game_codes/snake.html" id="snake-btn" class="game-button"><i class="fas fa-square"></i>Snake<span
-                    class="tooltip">Control a snake to eat food and grow.</span></a>
-            <a href="game_codes/tic_tac_toe.html" id="tic-tac-toe-btn" class="game-button"><i
-                    class="fas fa-times"></i>Tic Tac Toe<span class="tooltip">Play the classic game of Tic Tac Toe
-                    against a friend or AI.</span></a>
-            <a href="game_codes/whack_a_mole.html" id="whack-mole-btn" class="game-button"><i
-                    class="fas fa-hammer"></i>Whack-a-Mole<span class="tooltip">Whack as many moles as you can in a
-                    limited time.</span></a>
+            <a href="game_codes/guess_the_number.html" id="guess-btn" class="game-button" tabindex="0">
+                <i class="fas fa-dice"></i>Guess the Number
+                <span class="tooltip">Try to guess the correct number within a given range.</span>
+            </a>
+            <a href="game_codes/memory_card_game.html" id="memory-btn" class="game-button" tabindex="0">
+                <i class="fas fa-memory"></i>Memory Card Game
+                <span class="tooltip">Match pairs of cards in the shortest time possible.</span>
+            </a>
+            <a href="game_codes/pong.html" id="pong-btn" class="game-button" tabindex="0">
+                <i class="fas fa-table-tennis"></i>Pong
+                <span class="tooltip">Classic table tennis game.</span>
+            </a>
+            <a href="game_codes/rock_paper_scissors.html" id="rock-paper-btn" class="game-button" tabindex="0">
+                <i class="fas fa-hand-rock"></i>Rock Paper Scissors
+                <span class="tooltip">Play the classic hand game against the computer.</span>
+            </a>
+            <a href="game_codes/snake.html" id="snake-btn" class="game-button" tabindex="0">
+                <i class="fas fa-square"></i>Snake
+                <span class="tooltip">Control a snake to eat food and grow.</span>
+            </a>
+            <a href="game_codes/tic_tac_toe.html" id="tic-tac-toe-btn" class="game-button" tabindex="0">
+                <i class="fas fa-times"></i>Tic Tac Toe
+                <span class="tooltip">Play the classic game of Tic Tac Toe against a friend or AI.</span>
+            </a>
+            <a href="game_codes/whack_a_mole.html" id="whack-mole-btn" class="game-button" tabindex="0">
+                <i class="fas fa-hammer"></i>Whack-a-Mole
+                <span class="tooltip">Whack as many moles as you can in a limited time.</span>
+            </a>
         </div>
     </div>
 
     <script>
         window.onload = function () {
-            var buttons = document.querySelectorAll('.game-button');
-            buttons.forEach(function (button, index) {
-                setTimeout(function () {
+            // Check for reduced motion preference
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (prefersReducedMotion) {
+                // Apply all animations immediately for users who prefer reduced motion
+                document.querySelectorAll('.game-button').forEach(button => {
                     button.classList.add('animate');
-                }, index * 100);
-            });
+                });
+            } else {
+                // Staggered animation
+                var buttons = document.querySelectorAll('.game-button');
+                buttons.forEach(function (button, index) {
+                    setTimeout(function () {
+                        button.classList.add('animate');
+                    }, index * 100);
+                });
+            }
+
+            // Improve touch device experience
+            if ('ontouchstart' in window) {
+                const buttons = document.querySelectorAll('.game-button');
+                buttons.forEach(button => {
+                    button.addEventListener('touchstart', function () {
+                        // Remove active class from all other buttons
+                        buttons.forEach(b => {
+                            if (b !== button) b.classList.remove('touch-active');
+                        });
+                        // Toggle active class on this button
+                        this.classList.toggle('touch-active');
+                    });
+                });
+
+                // Close tooltips when tapping elsewhere
+                document.addEventListener('touchstart', function (e) {
+                    if (!e.target.closest('.game-button')) {
+                        buttons.forEach(b => b.classList.remove('touch-active'));
+                    }
+                });
+            }
         };
     </script>
-
 </body>
 
 </html>
