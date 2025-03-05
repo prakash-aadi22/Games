@@ -4,132 +4,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub</title>
+    <title>Game Arcade</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap');
+
         :root {
-            --primary-color: #6a11cb;
-            --secondary-color: #2575fc;
-            --background-color: #f4f4f4;
-            --text-color: #ffffff;
-            --hover-color: #8e2de2;
+            --dark-bg: #0f0f1a;
+            --neon-blue: #00f0ff;
+            --neon-purple: #8a2be2;
+            --neon-green: #0fff95;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0ff;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
+            perspective: 1500px;
         }
 
-        .container {
+        .game-arcade {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
             padding: 2rem;
         }
 
-        .games-title {
+        .arcade-title {
             text-align: center;
-            color: var(--text-color);
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: 2.5rem;
-            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            letter-spacing: 1px;
+            font-size: clamp(3rem, 8vw, 5rem);
+            margin-bottom: 3rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            letter-spacing: 3px;
+            transform: translateZ(50px);
         }
 
-        .game-buttons {
+        .game-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            perspective: 1000px;
+            gap: 2rem;
         }
 
-        .game-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            color: var(--text-color);
-            text-decoration: none;
-            padding: 1.5rem;
-            border-radius: 15px;
+        .game-card {
+            background: linear-gradient(145deg, rgba(40, 40, 80, 0.8), rgba(20, 20, 40, 0.8));
+            border: 2px solid transparent;
+            border-image: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)) 1;
+            border-radius: 20px;
+            padding: 2rem;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
             transform-style: preserve-3d;
-            transform: rotateX(10deg) scale(0.9);
+            transform: rotateX(15deg) rotateY(-15deg) translateZ(-100px);
             opacity: 0;
         }
 
-        .game-button::before {
+        .game-card::before {
             content: '';
             position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, transparent 70%);
             transform: rotate(-45deg);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .game-button:hover::before {
+        .game-card:hover::before {
             opacity: 1;
         }
 
-        .game-button i {
-            font-size: 2.5rem;
+        .game-card:hover {
+            transform: rotateX(0) rotateY(0) scale(1.05) translateZ(50px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .game-title {
+            font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: var(--text-color);
-            transform: translateZ(30px);
+            color: var(--text-primary);
+            letter-spacing: 1px;
         }
 
-        .game-button h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            transform: translateZ(20px);
-        }
-
-        .game-button:hover {
-            transform: rotateX(0) scale(1.05);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .game-button .game-description {
+        .game-description {
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
             opacity: 0;
             transition: opacity 0.3s ease;
-            transform: translateZ(10px);
         }
 
-        .game-button:hover .game-description {
+        .game-card:hover .game-description {
             opacity: 1;
+        }
+
+        .game-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            z-index: 10;
         }
 
         @media (max-width: 768px) {
-            .game-buttons {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            .game-grid {
+                grid-template-columns: 1fr;
             }
 
-            .game-button {
-                padding: 1rem;
+            .game-card {
+                transform: none;
+            }
+
+            .game-card:hover {
+                transform: scale(1.05);
             }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .game-button {
+            .game-card {
                 transform: none;
                 opacity: 1;
             }
@@ -138,61 +163,71 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="games-title">Game Hub</h1>
-        <div class="game-buttons">
-            <a href="game_codes/guess_the_number.html" class="game-button">
-                <i class="fas fa-dice"></i>
-                <h3>Guess the Number</h3>
-                <p class="game-description">Test your intuition by guessing the hidden number</p>
-            </a>
-            <a href="game_codes/memory_card_game.html" class="game-button">
-                <i class="fas fa-memory"></i>
-                <h3>Memory Card Game</h3>
-                <p class="game-description">Challenge your memory by matching card pairs</p>
-            </a>
-            <a href="game_codes/pong.html" class="game-button">
-                <i class="fas fa-table-tennis"></i>
-                <h3>Pong</h3>
-                <p class="game-description">Classic table tennis arcade game</p>
-            </a>
-            <a href="game_codes/rock_paper_scissors.html" class="game-button">
-                <i class="fas fa-hand-rock"></i>
-                <h3>Rock Paper Scissors</h3>
-                <p class="game-description">Play the timeless hand game against computer</p>
-            </a>
-            <a href="game_codes/snake.html" class="game-button">
-                <i class="fas fa-square"></i>
-                <h3>Snake</h3>
-                <p class="game-description">Control the snake and eat food to grow</p>
-            </a>
-            <a href="game_codes/tic_tac_toe.html" class="game-button">
-                <i class="fas fa-times"></i>
-                <h3>Tic Tac Toe</h3>
-                <p class="game-description">Classic strategy game with friends or AI</p>
-            </a>
-            <a href="game_codes/whack_a_mole.html" class="game-button">
-                <i class="fas fa-hammer"></i>
-                <h3>Whack-a-Mole</h3>
-                <p class="game-description">Smash moles in this fast-paced reaction game</p>
-            </a>
+    <div class="game-arcade">
+        <h1 class="arcade-title">Neon Arcade</h1>
+        <div class="game-grid">
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-dice"></i></div>
+                <h2 class="game-title">Guess the Number</h2>
+                <p class="game-description">Test your numerical intuition in this mind-bending number guessing
+                    challenge!</p>
+                <a href="game_codes/guess_the_number.html" class="game-link"></a>
+            </div>
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-memory"></i></div>
+                <h2 class="game-title">Memory Cards</h2>
+                <p class="game-description">Push your memory to the limits with this brain-teasing card matching game!
+                </p>
+                <a href="game_codes/memory_card_game.html" class="game-link"></a>
+            </div>
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-table-tennis"></i></div>
+                <h2 class="game-title">Retro Pong</h2>
+                <p class="game-description">Relive the classic arcade experience with this timeless table tennis battle!
+                </p>
+                <a href="game_codes/pong.html" class="game-link"></a>
+            </div>
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-hand-rock"></i></div>
+                <h2 class="game-title">Rock Paper Scissors</h2>
+                <p class="game-description">The ultimate showdown of hand gestures - strategy meets chance!</p>
+                <a href="game_codes/rock_paper_scissors.html" class="game-link"></a>
+            </div>
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-square"></i></div>
+                <h2 class="game-title">Snake Adventure</h2>
+                <p class="game-description">Navigate the classic snake through a thrilling maze of challenges!</p>
+                <a href="game_codes/snake.html" class="game-link"></a>
+            </div>
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-times"></i></div>
+                <h2 class="game-title">Tic Tac Toe</h2>
+                <p class="game-description">The ultimate battle of wits - can you outmaneuver your opponent?</p>
+                <a href="game_codes/tic_tac_toe.html" class="game-link"></a>
+            </div>
+            <div class="game-card">
+                <div class="game-icon"><i class="fas fa-hammer"></i></div>
+                <h2 class="game-title">Whack-a-Mole</h2>
+                <p class="game-description">Lightning-fast reflexes meet mischievous moles in this arcade classic!</p>
+                <a href="game_codes/whack_a_mole.html" class="game-link"></a>
+            </div>
         </div>
     </div>
 
     <script>
         window.addEventListener('load', () => {
-            const buttons = document.querySelectorAll('.game-button');
+            const cards = document.querySelectorAll('.game-card');
             const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            buttons.forEach((button, index) => {
+            cards.forEach((card, index) => {
                 if (!reducedMotion) {
                     setTimeout(() => {
-                        button.style.transform = 'rotateX(0) scale(1)';
-                        button.style.opacity = '1';
+                        card.style.transform = 'rotateX(0) rotateY(0) translateZ(0)';
+                        card.style.opacity = '1';
                     }, index * 100);
                 } else {
-                    button.style.transform = 'none';
-                    button.style.opacity = '1';
+                    card.style.transform = 'none';
+                    card.style.opacity = '1';
                 }
             });
         });
