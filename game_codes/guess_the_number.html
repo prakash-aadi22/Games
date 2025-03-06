@@ -5,28 +5,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Number Guessing Game</title>
+    <link rel="shortcut icon" href="gameloop-240.png" type="image/x-icon">
     <style>
         :root {
-            --primary-color: #007bff;
-            --primary-dark: #0056b3;
-            --text-color: #333;
-            --background-color: #f4f4f4;
-            --container-bg: #fff;
-            --border-color: #ccc;
-            --feedback-color: #007bff;
-            --success-color: #28a745;
-            --error-color: #dc3545;
+            --primary-color: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #eef2ff;
+            --text-color: #2b2d42;
+            --background-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --feedback-color: #4361ee;
+            --success-color: #06d6a0;
+            --error-color: #ef476f;
+            --shadow-color: rgba(0, 0, 0, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: var(--background-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #000000 100%);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -38,108 +42,170 @@
 
         .container {
             background-color: var(--container-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: clamp(15px, 5vw, 30px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: clamp(20px, 5vw, 40px);
             text-align: center;
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary-color), var(--success-color));
         }
 
         h1 {
-            margin-bottom: 15px;
-            font-size: clamp(1.5rem, 5vw, 2rem);
+            margin-bottom: 20px;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
             color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         p {
-            margin-bottom: 15px;
-            font-size: clamp(1rem, 3vw, 1.1rem);
+            margin-bottom: 18px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--text-color);
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         input[type="number"] {
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
             width: 100%;
             max-width: 250px;
-            border-radius: 5px;
-            border: 1px solid var(--border-color);
-            font-size: 1rem;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            font-size: 1.1rem;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         input[type="number"]:focus {
-            outline: 2px solid var(--primary-color);
-            border-color: transparent;
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
         button {
-            padding: 12px 25px;
+            padding: 14px 25px;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            transition: background-color 0.2s, transform 0.1s;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
             width: 100%;
             max-width: 250px;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
         }
 
         button:hover {
             background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
         }
 
         #feedback {
-            margin-top: 20px;
+            margin-top: 25px;
             color: var(--feedback-color);
-            font-weight: bold;
+            font-weight: 600;
             min-height: 50px;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            padding: 10px 15px;
+            border-radius: 10px;
+            background-color: var(--primary-light);
         }
 
         .success {
-            color: var(--success-color);
+            color: var(--success-color) !important;
+            background-color: rgba(6, 214, 160, 0.1) !important;
         }
 
         .error {
-            color: var(--error-color);
+            color: var(--error-color) !important;
+            background-color: rgba(239, 71, 111, 0.1) !important;
         }
 
         .attempts {
-            margin-top: 15px;
-            font-size: 0.9rem;
+            margin-top: 20px;
+            font-size: 1rem;
             color: #666;
+            font-weight: 500;
         }
 
         .home-link {
             display: inline-block;
-            margin-top: 25px;
+            margin-top: 30px;
             color: var(--primary-color);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: var(--primary-light);
         }
 
         .home-link:hover {
-            text-decoration: underline;
+            background-color: rgba(67, 97, 238, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .guess-range {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .number-badge {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            opacity: 0;
         }
 
         @media screen and (max-width: 480px) {
             .container {
-                padding: 20px 15px;
-                border-radius: 8px;
+                padding: 25px 18px;
+                border-radius: 12px;
             }
 
             input[type="number"],
@@ -153,12 +219,17 @@
 <body>
     <div class="container">
         <h1>Number Guessing Game</h1>
-        <p>Guess a number between 1 and 10:</p>
+        <p>I'm thinking of a number between 1 and 10.</p>
+        <div class="guess-range">
+            <div class="number-badge">1</div>
+            <div>to</div>
+            <div class="number-badge">10</div>
+        </div>
         <div class="input-group">
             <input type="number" id="guessField" min="1" max="10" placeholder="Enter your guess" />
             <button id="guessButton">Submit Guess</button>
         </div>
-        <p id="feedback">Enter a number and submit your guess!</p>
+        <p id="feedback">What's your guess?</p>
         <p id="attempts" class="attempts"></p>
         <a href="../index.html" class="home-link">Back to Games</a>
     </div>
@@ -172,6 +243,7 @@
         const feedback = document.getElementById('feedback');
         const attemptsDisplay = document.getElementById('attempts');
         const guessButton = document.getElementById('guessButton');
+        const container = document.querySelector('.container');
 
         // Add event listener for Enter key
         guessField.addEventListener('keyup', function (event) {
@@ -191,6 +263,7 @@
             if (isNaN(guess) || guess < 1 || guess > 10) {
                 feedback.textContent = 'Please enter a valid number between 1 and 10.';
                 feedback.classList.add('error');
+                shakeElement(guessField);
                 return;
             }
 
@@ -198,18 +271,21 @@
             attemptsDisplay.textContent = `Attempts: ${attempts}`;
 
             if (guess === randomNumber) {
-                feedback.textContent = `Congratulations! You guessed the correct number (${randomNumber})!`;
+                feedback.textContent = `Congratulations! ${randomNumber} is correct!`;
                 feedback.classList.add('success');
                 guessField.disabled = true;
+
+                // Show confetti animation
+                createConfetti();
 
                 // Show play again button
                 guessButton.textContent = 'Play Again';
                 guessButton.onclick = resetGame;
             } else if (guess < randomNumber) {
-                feedback.textContent = 'Too low! Try again.';
+                feedback.textContent = 'Too low! Try a higher number.';
                 feedback.classList.add('error');
             } else {
-                feedback.textContent = 'Too high! Try again.';
+                feedback.textContent = 'Too high! Try a lower number.';
                 feedback.classList.add('error');
             }
 
@@ -228,13 +304,62 @@
             guessField.disabled = false;
             guessField.value = '';
             guessField.focus();
-            feedback.textContent = 'Enter a number and submit your guess!';
+            feedback.textContent = "What's your guess?";
             feedback.classList.remove('success', 'error');
 
             // Restore original button functionality
             guessButton.textContent = 'Submit Guess';
             guessButton.onclick = checkGuess;
         }
+
+        // Add shake animation for invalid input
+        function shakeElement(element) {
+            element.style.animation = 'none';
+            setTimeout(() => {
+                element.style.animation = 'shake 0.5s';
+            }, 10);
+        }
+
+        // Add confetti animation for winning
+        function createConfetti() {
+            const colors = ['#4361ee', '#06d6a0', '#ef476f', '#ffd166', '#118ab2'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.opacity = 1;
+                confetti.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+
+                container.appendChild(confetti);
+
+                // Animate confetti falling
+                setTimeout(() => {
+                    confetti.style.top = '100%';
+                    confetti.style.opacity = 0;
+                }, 10);
+
+                // Remove confetti elements after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 2000);
+            }
+        }
+
+        // Add CSS animation for shake effect
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-5px); }
+                40%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 

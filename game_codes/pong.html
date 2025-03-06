@@ -4,20 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong Game</title>
+    <title>Modern Pong Game</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="shortcut icon" href="gameloop-240.png" type="image/x-icon">
     <style>
         :root {
-            --primary-color: #007bff;
-            --primary-dark: #0056b3;
-            --text-color: #333;
-            --background-color: #f4f4f4;
-            --container-bg: #fff;
-            --border-color: #ccc;
-            --feedback-color: #007bff;
-            --success-color: #28a745;
-            --error-color: #dc3545;
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #34495e;
+            --border-radius: 12px;
+            --container-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --button-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
         }
 
         * {
@@ -27,8 +29,9 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            color: var(--light-color);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -38,18 +41,32 @@
             overflow: hidden;
         }
 
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
         .game-container {
             width: 100%;
             max-width: 800px;
             position: relative;
             margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--container-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         canvas {
             display: block;
-            background-color: #fff;
-            border: 2px solid #333;
-            border-radius: 4px;
+            background: linear-gradient(to bottom, #2c3e50, #1a2530);
+            border-radius: var(--border-radius);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 100%;
             height: auto;
@@ -59,51 +76,132 @@
         .controls {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
             max-width: 800px;
             margin-top: 20px;
+            padding: 15px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--container-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        button {
-            background-color: #4a90e2;
+        .btn-game {
+            background: var(--accent-color);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 30px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all var(--transition-speed);
+            box-shadow: var(--button-shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        button:hover {
-            background-color: #357ab8;
+        .btn-game svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-game:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            background-color: #e67e22;
+        }
+
+        .btn-game:active {
+            transform: translateY(0);
+        }
+
+        #resetBtn {
+            background-color: var(--secondary-color);
+        }
+
+        #resetBtn:hover {
+            background-color: #27ae60;
+        }
+
+        #pauseBtn {
+            background-color: var(--primary-color);
+        }
+
+        #pauseBtn:hover {
+            background-color: #2980b9;
         }
 
         .score-display {
-            font-size: 18px;
+            font-size: 24px;
             font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .score-value {
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .score-divider {
+            font-size: 28px;
+            opacity: 0.7;
         }
 
         .home-link {
             display: inline-block;
             margin-top: 25px;
-            color: var(--primary-color);
+            color: white;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            transition: all var(--transition-speed);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .home-link:hover {
-            text-decoration: underline;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
-        /* Mobile-specific styles */
+        .instructions {
+            max-width: 800px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 0.9rem;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+
             .game-container {
-                max-width: 100%;
+                padding: 10px;
             }
 
             canvas.vertical-mode {
-                /* This will be applied via JavaScript for mobile */
                 height: 70vh;
                 width: auto;
                 max-width: 100%;
@@ -112,540 +210,203 @@
 
             .controls {
                 flex-direction: row;
-                justify-content: space-around;
-                width: 100%;
-                margin-top: 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 10px;
             }
 
-            button {
+            .btn-game {
                 font-size: 14px;
-                padding: 6px 12px;
+                padding: 8px 16px;
+            }
+
+            .score-display {
+                font-size: 20px;
+                padding: 8px 16px;
+                order: -1;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 5px;
+            }
+
+            .instructions {
+                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 
 <body>
+    <h1 class="page-title">Classic Pong</h1>
     <div class="game-container">
+        <!-- Set the canvas drawing dimensions explicitly -->
         <canvas id="gameCanvas"></canvas>
     </div>
-
     <div class="controls">
-        <button id="resetBtn">New Game</button>
+        <button id="resetBtn" class="btn-game">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+            </svg>
+            New Game
+        </button>
         <div class="score-display">
-            <span id="leftScore">0</span> - <span id="rightScore">0</span>
+            <span id="leftScore" class="score-value">0</span>
+            <span class="score-divider">:</span>
+            <span id="rightScore" class="score-value">0</span>
         </div>
-        <button id="pauseBtn">Pause</button>
-        <a href="../index.html" class="home-link">Back to Games</a>
+        <button id="pauseBtn" class="btn-game">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            Pause
+        </button>
     </div>
+    <div class="instructions">
+        <p>Use your mouse or touch to control the paddle. Beat the AI by scoring more points!</p>
+    </div>
+    <a href="../index.html" class="home-link">← Back to Games</a>
 
     <script>
+        // Set the canvas drawing dimensions
         const canvas = document.getElementById('gameCanvas');
+        canvas.width = 800;
+        canvas.height = 400;
         const ctx = canvas.getContext('2d');
         const resetBtn = document.getElementById('resetBtn');
         const pauseBtn = document.getElementById('pauseBtn');
-        const leftScoreDisplay = document.getElementById('leftScore');
-        const rightScoreDisplay = document.getElementById('rightScore');
+
+        const gameWidth = canvas.width;
+        const gameHeight = canvas.height;
 
         // Game state
         let isPaused = false;
-        let gameWidth = 800;
-        let gameHeight = 400;
-        let verticalMode = false;
-        let isMobile = false;
-
-        // Ratios for horizontal mode
-        let horizontalPaddleWidthRatio = 0.0125; // 1.25% of game width
-        let horizontalPaddleHeightRatio = 0.25; // 25% of game height
-        let horizontalBallSizeRatio = 0.025; // 2.5% of game width
-
-        // Ratios for vertical mode
-        let verticalPaddleWidthRatio = 0.25; // 25% of game width
-        let verticalPaddleHeightRatio = 0.0125; // 1.25% of game height
-        let verticalBallSizeRatio = 0.025; // 2.5% of game height
-
-        // Game variables
-        let leftPaddleY, leftPaddleX;
-        let rightPaddleY, rightPaddleX;
-        let ballX, ballY;
-        let dx, dy;
-        let paddleWidth, paddleHeight, ballSize;
         let leftScore = 0;
         let rightScore = 0;
-        let paddleSpeed, ballSpeedX, ballSpeedY;
-        let animationId;
-        let lastTouchX, lastTouchY;
 
-        // Check if device is mobile
-        function checkMobileDevice() {
-            isMobile = window.innerWidth <= 768;
-            verticalMode = isMobile;
-            return isMobile;
-        }
+        // Paddle properties
+        const paddleWidth = 10;
+        const paddleHeight = 80;
+        let leftPaddleY = gameHeight / 2 - paddleHeight / 2;
+        const leftPaddleX = 10;
+        let rightPaddleY = gameHeight / 2 - paddleHeight / 2;
+        const rightPaddleX = gameWidth - 20;
+        const paddleSpeed = 5;
 
-        // Initialize the game dimensions
-        function setupGameDimensions() {
-            const container = canvas.parentElement;
-            const containerWidth = container.clientWidth;
+        // Ball properties
+        const ballSize = 10;
+        let ballX = gameWidth / 2;
+        let ballY = gameHeight / 2;
+        let ballSpeedX = 4;
+        let ballSpeedY = 3;
 
-            if (verticalMode) {
-                // Vertical mode (mobile portrait)
-                canvas.classList.add('vertical-mode');
-                canvas.width = containerWidth * 0.8; // Narrower width for portrait
-                canvas.height = canvas.width * 2; // 1:2 aspect ratio for vertical
-
-                gameWidth = canvas.width;
-                gameHeight = canvas.height;
-
-                // Calculate game element sizes for vertical mode
-                paddleWidth = gameWidth * verticalPaddleWidthRatio;
-                paddleHeight = gameHeight * verticalPaddleHeightRatio;
-                ballSize = gameHeight * verticalBallSizeRatio;
-
-                // Speed ratios for vertical mode
-                paddleSpeed = gameWidth * 0.03;
-                ballSpeedX = gameWidth * 0.008;
-                ballSpeedY = gameHeight * 0.004;
-            } else {
-                // Horizontal mode (desktop/landscape)
-                canvas.classList.remove('vertical-mode');
-                canvas.width = containerWidth;
-                canvas.height = containerWidth * 0.5; // 2:1 aspect ratio for horizontal
-
-                gameWidth = canvas.width;
-                gameHeight = canvas.height;
-
-                // Calculate game element sizes for horizontal mode
-                paddleWidth = gameWidth * horizontalPaddleWidthRatio;
-                paddleHeight = gameHeight * horizontalPaddleHeightRatio;
-                ballSize = gameWidth * horizontalBallSizeRatio;
-
-                // Speed ratios for horizontal mode
-                paddleSpeed = gameHeight * 0.015;
-                ballSpeedX = gameWidth * 0.006;
-                ballSpeedY = gameHeight * 0.012;
+        // Draw the center net
+        function drawNet() {
+            ctx.fillStyle = 'white';
+            for (let i = 0; i < gameHeight; i += 15) {
+                ctx.fillRect(gameWidth / 2 - 1, i, 2, 10);
             }
         }
 
-        // Initialize game elements
-        function initGame() {
-            checkMobileDevice();
-            setupGameDimensions();
+        // Draw all game elements
+        function draw() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, gameWidth, gameHeight);
+            drawNet();
+            ctx.fillStyle = 'green';
+            ctx.fillRect(leftPaddleX, leftPaddleY, paddleWidth, paddleHeight);
+            ctx.fillStyle = 'red';
+            ctx.fillRect(rightPaddleX, rightPaddleY, paddleWidth, paddleHeight);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(ballX - ballSize / 2, ballY - ballSize / 2, ballSize, ballSize);
+            document.getElementById('leftScore').textContent = leftScore;
+            document.getElementById('rightScore').textContent = rightScore;
+        }
 
-            if (verticalMode) {
-                // Vertical mode - paddles at top and bottom
-                leftPaddleX = gameWidth / 2 - paddleWidth / 2;
-                leftPaddleY = gameHeight - paddleHeight - 10;
+        // Update game state
+        function update() {
+            if (isPaused) return;
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
 
-                rightPaddleX = gameWidth / 2 - paddleWidth / 2;
-                rightPaddleY = 10;
-            } else {
-                // Horizontal mode - paddles on left and right
-                leftPaddleX = paddleWidth;
-                leftPaddleY = gameHeight / 2 - paddleHeight / 2;
-
-                rightPaddleX = gameWidth - paddleWidth * 2;
-                rightPaddleY = gameHeight / 2 - paddleHeight / 2;
+            // Bounce off top and bottom
+            if (ballY - ballSize / 2 < 0 || ballY + ballSize / 2 > gameHeight) {
+                ballSpeedY = -ballSpeedY;
             }
 
-            // Initial ball position at center
+            // Collision with left paddle (player)
+            if (ballX - ballSize / 2 < leftPaddleX + paddleWidth) {
+                if (ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) {
+                    ballSpeedX = -ballSpeedX;
+                    ballX = leftPaddleX + paddleWidth + ballSize / 2;
+                }
+            }
+
+            // Collision with right paddle (AI)
+            if (ballX + ballSize / 2 > rightPaddleX) {
+                if (ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight) {
+                    ballSpeedX = -ballSpeedX;
+                    ballX = rightPaddleX - ballSize / 2;
+                }
+            }
+
+            // Score if ball goes past a paddle
+            if (ballX < 0) {
+                rightScore++;
+                resetBall();
+            }
+            if (ballX > gameWidth) {
+                leftScore++;
+                resetBall();
+            }
+
+            // AI movement: use a reduced speed (70% of paddleSpeed) for error
+            const aiSpeed = paddleSpeed * 0.5;
+            if (rightPaddleY + paddleHeight / 2 < ballY) {
+                rightPaddleY += aiSpeed;
+            } else {
+                rightPaddleY -= aiSpeed;
+            }
+            rightPaddleY = Math.max(0, Math.min(gameHeight - paddleHeight, rightPaddleY));
+        }
+
+        // Reset ball position and reverse direction
+        function resetBall() {
             ballX = gameWidth / 2;
             ballY = gameHeight / 2;
-
-            // Reset scores for new game
-            if (resetBtn.innerText === "New Game") {
-                leftScore = 0;
-                rightScore = 0;
-                updateScoreDisplay();
-            }
-        }
-
-        // Update score display
-        function updateScoreDisplay() {
-            leftScoreDisplay.textContent = leftScore;
-            rightScoreDisplay.textContent = rightScore;
-        }
-
-        // Handle mouse movement for horizontal mode
-        function moveWithMouse(e) {
-            if (isPaused || verticalMode) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const mouseY = e.clientY - rect.top - paddleHeight / 2;
-
-            // Keep paddle within canvas bounds
-            if (mouseY >= 0 && mouseY <= gameHeight - paddleHeight) {
-                leftPaddleY = mouseY;
-            }
-        }
-
-        // Handle touch for both vertical and horizontal modes
-        function handleTouch(e) {
-            if (isPaused) return;
-            e.preventDefault();
-
-            const rect = canvas.getBoundingClientRect();
-            const touchX = e.touches[0].clientX - rect.left;
-            const touchY = e.touches[0].clientY - rect.top;
-
-            // Store last touch position for movement detection
-            lastTouchX = touchX;
-            lastTouchY = touchY;
-
-            if (verticalMode) {
-                // Vertical mode - move paddle left/right based on touch X position
-                const paddleX = touchX - paddleWidth / 2;
-
-                // Keep paddle within canvas bounds
-                if (paddleX >= 0 && paddleX <= gameWidth - paddleWidth) {
-                    leftPaddleX = paddleX;
-                }
-            } else {
-                // Horizontal mode - move paddle up/down based on touch Y position
-                const paddleY = touchY - paddleHeight / 2;
-
-                // Keep paddle within canvas bounds
-                if (paddleY >= 0 && paddleY <= gameHeight - paddleHeight) {
-                    leftPaddleY = paddleY;
-                }
-            }
-        }
-
-        // Move AI paddle
-        function moveAIPaddle() {
-            if (isPaused) return;
-
-            if (verticalMode) {
-                // Vertical mode - AI paddle tracks ball's X position
-                const ballCenter = ballX;
-                const paddleCenter = rightPaddleX + paddleWidth / 2;
-                const aiReactionSpeed = 0.7;
-
-                if (ballCenter > paddleCenter + paddleWidth * 0.1) {
-                    rightPaddleX += paddleSpeed * aiReactionSpeed;
-                } else if (ballCenter < paddleCenter - paddleWidth * 0.1) {
-                    rightPaddleX -= paddleSpeed * aiReactionSpeed;
-                }
-
-                // Ensure AI paddle stays within bounds
-                if (rightPaddleX < 0) {
-                    rightPaddleX = 0;
-                } else if (rightPaddleX > gameWidth - paddleWidth) {
-                    rightPaddleX = gameWidth - paddleWidth;
-                }
-            } else {
-                // Horizontal mode - AI paddle tracks ball's Y position
-                const ballCenter = ballY;
-                const paddleCenter = rightPaddleY + paddleHeight / 2;
-                const aiReactionSpeed = 0.7;
-
-                if (ballCenter > paddleCenter + paddleHeight * 0.1) {
-                    rightPaddleY += paddleSpeed * aiReactionSpeed;
-                } else if (ballCenter < paddleCenter - paddleHeight * 0.1) {
-                    rightPaddleY -= paddleSpeed * aiReactionSpeed;
-                }
-
-                // Ensure AI paddle stays within bounds
-                if (rightPaddleY < 0) {
-                    rightPaddleY = 0;
-                } else if (rightPaddleY > gameHeight - paddleHeight) {
-                    rightPaddleY = gameHeight - paddleHeight;
-                }
-            }
+            ballSpeedX = -ballSpeedX;
+            ballSpeedY = 3 * (Math.random() > 0.5 ? 1 : -1);
         }
 
         // Main game loop
         function gameLoop() {
-            if (isPaused) {
-                animationId = requestAnimationFrame(gameLoop);
-                return;
-            }
-
-            // Clear the canvas
-            ctx.clearRect(0, 0, gameWidth, gameHeight);
-
-            // Draw paddles
-            ctx.fillStyle = '#000';
-
-            if (verticalMode) {
-                // Vertical mode - paddles at top and bottom
-                ctx.fillRect(rightPaddleX, rightPaddleY, paddleWidth, paddleHeight); // Top paddle (AI)
-                ctx.fillRect(leftPaddleX, leftPaddleY, paddleWidth, paddleHeight); // Bottom paddle (Player)
-            } else {
-                // Horizontal mode - paddles on left and right
-                ctx.fillRect(leftPaddleX, leftPaddleY, paddleWidth, paddleHeight); // Left paddle (Player)
-                ctx.fillRect(rightPaddleX, rightPaddleY, paddleWidth, paddleHeight); // Right paddle (AI)
-            }
-
-            // Draw ball
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff0000';
-            ctx.fill();
-            ctx.closePath();
-
-            // Draw center line
-            ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-
-            if (verticalMode) {
-                // Horizontal center line for vertical mode
-                ctx.moveTo(0, gameHeight / 2);
-                ctx.lineTo(gameWidth, gameHeight / 2);
-            } else {
-                // Vertical center line for horizontal mode
-                ctx.moveTo(gameWidth / 2, 0);
-                ctx.lineTo(gameWidth / 2, gameHeight);
-            }
-
-            ctx.strokeStyle = '#888';
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Move the ball
-            ballX += dx;
-            ballY += dy;
-
-            // Ball collision checks based on game orientation
-            if (verticalMode) {
-                // Vertical mode collision logic
-
-                // Ball collision with left and right walls
-                if (ballX + dx > gameWidth - ballSize || ballX + dx < ballSize) {
-                    dx = -dx;
-                }
-
-                // Ball collision with paddles (top and bottom)
-                if (
-                    // Bottom paddle (player)
-                    (ballY + ballSize > leftPaddleY &&
-                        ballY < leftPaddleY + paddleHeight &&
-                        ballX > leftPaddleX &&
-                        ballX < leftPaddleX + paddleWidth) ||
-                    // Top paddle (AI)
-                    (ballY - ballSize < rightPaddleY + paddleHeight &&
-                        ballY > rightPaddleY &&
-                        ballX > rightPaddleX &&
-                        ballX < rightPaddleX + paddleWidth)
-                ) {
-                    // Calculate angle based on where ball hits paddle horizontally
-                    if (ballY + ballSize > leftPaddleY) {
-                        // Bottom paddle hit
-                        const hitPosition = (ballX - (leftPaddleX + paddleWidth / 2)) / (paddleWidth / 2);
-                        dx = hitPosition * (gameWidth * 0.01);
-                    } else {
-                        // Top paddle hit
-                        const hitPosition = (ballX - (rightPaddleX + paddleWidth / 2)) / (paddleWidth / 2);
-                        dx = hitPosition * (gameWidth * 0.01);
-                    }
-
-                    // Reverse Y direction and slightly increase speed
-                    dy = -dy * 1.05;
-
-                    // Cap maximum speed
-                    const maxSpeedY = gameHeight * 0.008;
-                    if (Math.abs(dy) > maxSpeedY) {
-                        dy = dy > 0 ? maxSpeedY : -maxSpeedY;
-                    }
-                }
-
-                // Ball out of bounds - Bottom (player misses)
-                if (ballY + ballSize > gameHeight) {
-                    rightScore++;
-                    updateScoreDisplay();
-                    resetBall();
-                }
-
-                // Ball out of bounds - Top (AI misses)
-                if (ballY - ballSize < 0) {
-                    leftScore++;
-                    updateScoreDisplay();
-                    resetBall();
-                }
-            } else {
-                // Horizontal mode collision logic
-
-                // Ball collision with top and bottom walls
-                if (ballY + dy > gameHeight - ballSize || ballY + dy < ballSize) {
-                    dy = -dy;
-                }
-
-                // Ball collision with paddles (left and right)
-                if (
-                    // Left paddle (player)
-                    (ballX - ballSize < leftPaddleX + paddleWidth &&
-                        ballY > leftPaddleY &&
-                        ballY < leftPaddleY + paddleHeight) ||
-                    // Right paddle (AI)
-                    (ballX + ballSize > rightPaddleX &&
-                        ballY > rightPaddleY &&
-                        ballY < rightPaddleY + paddleHeight)
-                ) {
-                    // Calculate angle based on where ball hits paddle
-                    if (ballX - ballSize < leftPaddleX + paddleWidth) {
-                        // Left paddle hit
-                        const hitPosition = (ballY - (leftPaddleY + paddleHeight / 2)) / (paddleHeight / 2);
-                        dy = hitPosition * (gameHeight * 0.01);
-                    } else {
-                        // Right paddle hit
-                        const hitPosition = (ballY - (rightPaddleY + paddleHeight / 2)) / (paddleHeight / 2);
-                        dy = hitPosition * (gameHeight * 0.01);
-                    }
-
-                    // Reverse X direction and slightly increase speed
-                    dx = -dx * 1.05;
-
-                    // Cap maximum speed
-                    const maxSpeedX = gameWidth * 0.01;
-                    if (Math.abs(dx) > maxSpeedX) {
-                        dx = dx > 0 ? maxSpeedX : -maxSpeedX;
-                    }
-                }
-
-                // Ball out of bounds - Right side (player scores)
-                if (ballX + ballSize > gameWidth) {
-                    leftScore++;
-                    updateScoreDisplay();
-                    resetBall();
-                }
-
-                // Ball out of bounds - Left side (AI scores)
-                if (ballX - ballSize < 0) {
-                    rightScore++;
-                    updateScoreDisplay();
-                    resetBall();
-                }
-            }
-
-            // Move AI paddle
-            moveAIPaddle();
-
-            // Continue the game loop
-            animationId = requestAnimationFrame(gameLoop);
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
         }
 
-        // Reset ball position
-        function resetBall() {
-            ballX = gameWidth / 2;
-            ballY = gameHeight / 2;
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            leftPaddleY = e.clientY - rect.top - paddleHeight / 2;
+            leftPaddleY = Math.max(0, Math.min(gameHeight - paddleHeight, leftPaddleY));
+        });
 
-            // Randomize direction based on orientation
-            if (verticalMode) {
-                dx = gameWidth * 0.005 * (Math.random() > 0.5 ? 1 : -1);
-                dy = gameHeight * 0.004 * (Math.random() > 0.5 ? 1 : -1);
-                // Ensure ball goes toward either player or AI
-                dy = Math.random() > 0.5 ? Math.abs(dy) : -Math.abs(dy);
-            } else {
-                dx = gameWidth * 0.006 * (Math.random() > 0.5 ? 1 : -1);
-                dy = gameHeight * 0.008 * (Math.random() > 0.5 ? 1 : -1);
-                // Ensure ball goes toward either player or AI
-                dx = Math.random() > 0.5 ? Math.abs(dx) : -Math.abs(dx);
-            }
-        }
+        resetBtn.addEventListener('click', () => {
+            leftScore = 0;
+            rightScore = 0;
+            resetBall();
+        });
 
-        // Toggle pause/resume game
-        function togglePause() {
+        pauseBtn.addEventListener('click', () => {
             isPaused = !isPaused;
             pauseBtn.textContent = isPaused ? "Resume" : "Pause";
-        }
+        });
 
-        // Reset the game
-        function resetGame() {
-            cancelAnimationFrame(animationId);
-            initGame();
-            isPaused = false;
-            pauseBtn.textContent = "Pause";
-
-            // Set initial ball direction based on orientation
-            if (verticalMode) {
-                dx = gameWidth * 0.005 * (Math.random() > 0.5 ? 1 : -1);
-                dy = gameHeight * 0.004;
-            } else {
-                dx = gameWidth * 0.006;
-                dy = gameHeight * 0.008 * (Math.random() > 0.5 ? 1 : -1);
-            }
-
-            animationId = requestAnimationFrame(gameLoop);
-        }
-
-        // Update game on window resize and orientation change
-        function handleResize() {
-            const wasPaused = isPaused;
-            isPaused = true;
-
-            const oldVerticalMode = verticalMode;
-            checkMobileDevice();
-
-            // If orientation changed, do full reset
-            if (oldVerticalMode !== verticalMode) {
-                resetGame();
-            } else {
-                // Just adjust sizes proportionally
-                setupGameDimensions();
-
-                // Adjust positions proportionally
-                if (verticalMode) {
-                    const paddleXRatio = leftPaddleX / gameWidth;
-                    leftPaddleX = paddleXRatio * gameWidth;
-                    rightPaddleX = (rightPaddleX / gameWidth) * gameWidth;
-                } else {
-                    const paddleYRatio = leftPaddleY / gameHeight;
-                    leftPaddleY = paddleYRatio * gameHeight;
-                    rightPaddleY = (rightPaddleY / gameHeight) * gameHeight;
-                }
-
-                // Adjust ball position
-                ballX = (ballX / gameWidth) * gameWidth;
-                ballY = (ballY / gameHeight) * gameHeight;
-
-                // Adjust speeds proportionally
-                if (verticalMode) {
-                    dx = dx > 0 ? gameWidth * 0.005 : -gameWidth * 0.005;
-                    dy = dy > 0 ? gameHeight * 0.004 : -gameHeight * 0.004;
-                } else {
-                    dx = dx > 0 ? gameWidth * 0.006 : -gameWidth * 0.006;
-                    dy = dy > 0 ? gameHeight * 0.008 : -gameHeight * 0.008;
-                }
-            }
-
-            if (!wasPaused) {
-                isPaused = false;
-            }
-        }
-
-        // Handle orientation change for mobile
-        function handleOrientationChange() {
-            setTimeout(handleResize, 100); // Slight delay to ensure dimensions are updated
-        }
-
-        // Initialize the game
-        initGame();
-
-        // Set initial ball direction based on orientation
-        if (verticalMode) {
-            dx = gameWidth * 0.005 * (Math.random() > 0.5 ? 1 : -1);
-            dy = gameHeight * 0.004;
-        } else {
-            dx = gameWidth * 0.006;
-            dy = gameHeight * 0.008 * (Math.random() > 0.5 ? 1 : -1);
-        }
-
-        // Set up event listeners
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('orientationchange', handleOrientationChange);
-        document.addEventListener('mousemove', moveWithMouse);
-        canvas.addEventListener('touchmove', handleTouch, { passive: false });
-        canvas.addEventListener('touchstart', handleTouch, { passive: false });
-        resetBtn.addEventListener('click', resetGame);
-        pauseBtn.addEventListener('click', togglePause);
-
-        // Start the game
-        animationId = requestAnimationFrame(gameLoop);
+        gameLoop();
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
 </body>
 
 </html>
