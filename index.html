@@ -86,8 +86,8 @@
             position: relative;
             width: 100%;
             text-align: center;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
+            padding: 0;
+            margin-bottom: 0;
         }
 
         .arcade-title {
@@ -920,20 +920,21 @@
                     const rotateX = (y - centerY) / 10;
                     const rotateY = (centerX - x) / 10;
 
-                    // Apply transform
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-
-                    // Move the shine effect
-                    const shine = card.querySelector('::after');
-                    if (shine) {
-                        const percentX = x / rect.width * 100;
-                        const percentY = y / rect.height * 100;
-                        shine.style.backgroundPosition = `${percentX}% ${percentY}%`;
-                    }
+                    // Use GSAP to smoothly tween to the new transform
+                    gsap.to(card, {
+                        duration: 0.3,
+                        ease: "power2.out",
+                        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`
+                    });
                 });
 
                 card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                    // Smoothly reset the transform
+                    gsap.to(card, {
+                        duration: 0.3,
+                        ease: "power2.out",
+                        transform: 'perspective(1000px) rotateX(0) rotateY(0) scale(1)'
+                    });
                 });
             });
         }
