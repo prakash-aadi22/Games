@@ -4,17 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Arcade</title>
+    <title>Neon Arcade</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <link rel="shortcut icon" href="game_codes/gameloop-240.png" type="image/x-icon">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap');
 
         :root {
             --dark-bg: #0f0f1a;
+            --darker-bg: #080812;
             --neon-blue: #00f0ff;
             --neon-purple: #8a2be2;
             --neon-green: #0fff95;
+            --neon-pink: #ff00aa;
             --text-primary: #ffffff;
             --text-secondary: #b0b0ff;
         }
@@ -31,34 +34,107 @@
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
             perspective: 1500px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(0, 240, 255, 0.15) 0%, transparent 30%);
+            pointer-events: none;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            transform: perspective(500px) rotateX(60deg) scale(2.5) translateY(-10%);
+            transform-origin: center center;
+            opacity: 0.2;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, transparent 50%, rgba(0, 240, 255, 0.05) 50%, transparent 51%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .arcade-header {
+            position: relative;
+            width: 100%;
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .arcade-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            background-size: 300% 100%;
+            animation: gradient 8s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        .title-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            filter: blur(20px);
+            opacity: 0.5;
+            background: inherit;
+            z-index: -1;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            opacity: 0;
+            letter-spacing: 2px;
         }
 
         .game-arcade {
             width: 100%;
             max-width: 1400px;
-            padding: 2rem;
-        }
-
-        .arcade-title {
-            text-align: center;
-            font-size: clamp(3rem, 8vw, 5rem);
-            margin-bottom: 3rem;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-            letter-spacing: 3px;
-            transform: translateZ(50px);
+            padding: 1rem 2rem 4rem;
+            position: relative;
         }
 
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            position: relative;
         }
 
         .game-card {
@@ -74,29 +150,78 @@
             transform-style: preserve-3d;
             transform: rotateX(15deg) rotateY(-15deg) translateZ(-100px);
             opacity: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .game-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
             background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, transparent 70%);
             transform: rotate(-45deg);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.5s ease;
+            z-index: 0;
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+            transform: rotate(-45deg) translate(10%, 10%);
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent 65%, rgba(0, 240, 255, 0.3) 70%, transparent 75%);
+            background-size: 200% 200%;
+            animation: shine 3s linear infinite;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .game-card:hover::before {
+        .game-card:hover::after {
             opacity: 1;
         }
 
         .game-card:hover {
             transform: rotateX(0) rotateY(0) scale(1.05) translateZ(50px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-            box-shadow: 0 0 20px var(--neon-blue);
+            box-shadow:
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 0 20px var(--neon-blue),
+                0 0 30px rgba(0, 240, 255, 0.3);
+            z-index: 2;
+        }
+
+        .game-card:hover .game-title {
+            transform: translateY(-10px);
+        }
+
+        .game-card:hover .game-description {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .game-card:hover .play-now {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .game-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .game-icon {
@@ -105,11 +230,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.5));
         }
 
         .game-card:hover .game-icon {
             transform: scale(1.1) rotate(10deg);
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.8));
         }
 
         .game-title {
@@ -117,6 +244,7 @@
             margin-bottom: 1rem;
             color: var(--text-primary);
             letter-spacing: 1px;
+            transition: transform 0.3s ease;
         }
 
         .game-description {
@@ -124,11 +252,29 @@
             font-size: 0.9rem;
             line-height: 1.6;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            margin-bottom: 1.5rem;
         }
 
-        .game-card:hover .game-description {
-            opacity: 1;
+        .play-now {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .play-now:hover {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
+            transform: translateY(0) scale(1.05);
         }
 
         .game-link {
@@ -139,6 +285,210 @@
             height: 100%;
             text-decoration: none;
             z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--neon-blue);
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-btn:hover {
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-blue);
+            opacity: 0.6;
+            animation: float 15s linear infinite;
+        }
+
+        .particle:nth-child(2n) {
+            background: var(--neon-purple);
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        .particle:nth-child(3n) {
+            background: var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .sound-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 20, 40, 0.7);
+            color: var(--text-secondary);
+            border: 1px solid var(--neon-blue);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .sound-toggle:hover {
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-title {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Animations */
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
@@ -148,10 +498,20 @@
 
             .game-card {
                 transform: none;
+                height: auto;
+                min-height: 250px;
             }
 
             .game-card:hover {
                 transform: scale(1.05);
+            }
+
+            .arcade-header {
+                padding: 2rem 0;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
             }
         }
 
@@ -160,78 +520,714 @@
                 transform: none;
                 opacity: 1;
             }
+
+            .game-description {
+                opacity: 1;
+                transform: none;
+            }
+
+            .play-now {
+                opacity: 1;
+                transform: none;
+            }
+
+            .particle {
+                display: none;
+            }
+
+            .progress {
+                transition: none;
+            }
+
+            .scanline {
+                display: none;
+            }
+
+            .tagline,
+            .nav-buttons {
+                opacity: 1;
+            }
+
+            @keyframes gradient {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes shine {
+
+                0%,
+                100% {
+                    background-position: 0;
+                }
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="loader">
+        <div class="loader-content">
+            <h1 class="loader-title">Neon Arcade</h1>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-bg"></div>
+    <div class="scanline"></div>
+
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="arcade-header">
+        <h1 class="arcade-title">Neon Arcade<span class="title-glow"></span></h1>
+        <p class="tagline">Immerse yourself in retro gaming bliss</p>
+        <div class="nav-buttons">
+            <button class="nav-btn">Popular Games</button>
+            <button class="nav-btn">New Releases</button>
+        </div>
+    </div>
+
     <div class="game-arcade">
-        <h1 class="arcade-title">Neon Arcade</h1>
         <div class="game-grid">
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-dice"></i></div>
-                <h2 class="game-title">Guess the Number</h2>
-                <p class="game-description">Test your numerical intuition in this mind-bending number guessing
-                    challenge!</p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-dice"></i></div>
+                    <h2 class="game-title">Guess the Number</h2>
+                    <p class="game-description">Test your numerical intuition in this mind-bending number guessing
+                        challenge!</p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/guess_the_number.html" class="game-link"></a>
             </div>
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-memory"></i></div>
-                <h2 class="game-title">Memory Cards</h2>
-                <p class="game-description">Push your memory to the limits with this brain-teasing card matching game!
-                </p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-memory"></i></div>
+                    <h2 class="game-title">Memory Cards</h2>
+                    <p class="game-description">Push your memory to the limits with this brain-teasing card matching
+                        game!</p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/memory_card_game.html" class="game-link"></a>
             </div>
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-table-tennis"></i></div>
-                <h2 class="game-title">Retro Pong</h2>
-                <p class="game-description">Relive the classic arcade experience with this timeless table tennis battle!
-                </p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-table-tennis"></i></div>
+                    <h2 class="game-title">Retro Pong</h2>
+                    <p class="game-description">Relive the classic arcade experience with this timeless table tennis
+                        battle!</p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/pong.html" class="game-link"></a>
             </div>
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-hand-rock"></i></div>
-                <h2 class="game-title">Rock Paper Scissors</h2>
-                <p class="game-description">The ultimate showdown of hand gestures - strategy meets chance!</p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-hand-rock"></i></div>
+                    <h2 class="game-title">Rock Paper Scissors</h2>
+                    <p class="game-description">The ultimate showdown of hand gestures - strategy meets chance!</p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/rock_paper_scissors.html" class="game-link"></a>
             </div>
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-square"></i></div>
-                <h2 class="game-title">Snake Adventure</h2>
-                <p class="game-description">Navigate the classic snake through a thrilling maze of challenges!</p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-square"></i></div>
+                    <h2 class="game-title">Snake Adventure</h2>
+                    <p class="game-description">Navigate the classic snake through a thrilling maze of challenges!</p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/snake.html" class="game-link"></a>
             </div>
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-times"></i></div>
-                <h2 class="game-title">Tic Tac Toe</h2>
-                <p class="game-description">The ultimate battle of wits - can you outmaneuver your opponent?</p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-times"></i></div>
+                    <h2 class="game-title">Tic Tac Toe</h2>
+                    <p class="game-description">The ultimate battle of wits - can you outmaneuver your opponent?</p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/tic_tac_toe.html" class="game-link"></a>
             </div>
             <div class="game-card">
-                <div class="game-icon"><i class="fas fa-hammer"></i></div>
-                <h2 class="game-title">Whack-a-Mole</h2>
-                <p class="game-description">Lightning-fast reflexes meet mischievous moles in this arcade classic!</p>
+                <div class="game-content">
+                    <div class="game-icon"><i class="fas fa-hammer"></i></div>
+                    <h2 class="game-title">Whack-a-Mole</h2>
+                    <p class="game-description">Lightning-fast reflexes meet mischievous moles in this arcade classic!
+                    </p>
+                    <button class="play-now">PLAY NOW</button>
+                </div>
                 <a href="game_codes/whack_a_mole.html" class="game-link"></a>
             </div>
         </div>
     </div>
 
+    <div class="sound-toggle">
+        <i class="fas fa-volume-mute"></i>
+    </div>
+
     <script>
+        // Preloader Animation
         window.addEventListener('load', () => {
-            const cards = document.querySelectorAll('.game-card');
+            const loader = document.querySelector('.loader');
+            const progress = document.querySelector('.progress');
             const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            cards.forEach((card, index) => {
-                if (!reducedMotion) {
-                    setTimeout(() => {
-                        card.style.transform = 'rotateX(0) rotateY(0) translateZ(0)';
-                        card.style.opacity = '1';
-                    }, index * 100);
-                } else {
-                    card.style.transform = 'none';
-                    card.style.opacity = '1';
+            if (reducedMotion) {
+                // Skip animations for reduced motion
+                loader.style.display = 'none';
+                initializeElements();
+                return;
+            }
+
+            // Animate progress bar
+            gsap.to(progress, {
+                width: '100%',
+                duration: 2,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    // Fade out loader
+                    gsap.to(loader, {
+                        opacity: 0,
+                        duration: 0.8,
+                        onComplete: () => {
+                            loader.style.display = 'none';
+                            initializeElements();
+                        }
+                    });
                 }
             });
+        });
+
+        function initializeElements() {
+            const cards = document.querySelectorAll('.game-card');
+            const tagline = document.querySelector('.tagline');
+            const navButtons = document.querySelector('.nav-buttons');
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const soundToggle = document.querySelector('.sound-toggle');
+            let soundOn = false;
+
+            if (!reducedMotion) {
+                // Animate tagline and nav buttons
+                gsap.to(tagline, {
+                    opacity: 1,
+                    duration: 1,
+                    delay: 0.3
+                });
+
+                gsap.to(navButtons, {
+                    opacity: 1,
+                    duration: 1,
+                    delay: 0.5
+                });
+
+                // Animate cards
+                cards.forEach((card, index) => {
+                    gsap.to(card, {
+                        opacity: 1,
+                        transform: 'rotateX(0) rotateY(0) translateZ(0)',
+                        duration: 0.8,
+                        delay: 0.2 + index * 0.1,
+                        ease: "back.out(1.7)"
+                    });
+                });
+
+                // Create more floating particles dynamically
+                createParticles();
+            } else {
+                // For reduced motion, just make elements visible
+                tagline.style.opacity = '1';
+                navButtons.style.opacity = '1';
+                cards.forEach(card => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'none';
+                });
+            }
+
+            // Add hover sound effect
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    if (soundOn) {
+                        playSound('hover', 0.2);
+                    }
+                });
+                card.addEventListener('click', () => {
+                    if (soundOn) {
+                        playSound('click', 0.3);
+                    }
+                });
+            });
+
+            // Sound toggle functionality
+            soundToggle.addEventListener('click', () => {
+                soundOn = !soundOn;
+                soundToggle.innerHTML = soundOn ?
+                    '<i class="fas fa-volume-up"></i>' :
+                    '<i class="fas fa-volume-mute"></i>';
+
+                if (soundOn) {
+                    playSound('toggle', 0.3);
+                }
+            });
+
+            // Grid background parallax effect
+            if (!reducedMotion) {
+                const gridBg = document.querySelector('.grid-bg');
+                document.addEventListener('mousemove', (e) => {
+                    const x = e.clientX / window.innerWidth;
+                    const y = e.clientY / window.innerHeight;
+
+                    gsap.to(gridBg, {
+                        duration: 1,
+                        translateX: -15 + x * 30,
+                        translateY: -15 + y * 30,
+                        ease: "power1.out"
+                    });
+                });
+            }
+
+            // Nav buttons interaction
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (soundOn) {
+                        playSound('click', 0.3);
+                    }
+
+                    // Add active state
+                    navBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Shake animation for cards (simulating filtering)
+                    gsap.to(cards, {
+                        x: "random(-5, 5)",
+                        y: "random(-5, 5)",
+                        duration: 0.2,
+                        stagger: 0.05,
+                        repeat: 1,
+                        yoyo: true,
+                        ease: "power1.inOut",
+                        onComplete: () => {
+                            gsap.to(cards, {
+                                x: 0,
+                                y: 0,
+                                duration: 0.2
+                            });
+                        }
+                    });
+                });
+            });
+        }
+
+        // Create audio context and sounds
+        function createAudioContext() {
+            return new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(type, volume = 0.5) {
+            const audioContext = createAudioContext();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            gainNode.gain.value = volume;
+
+            switch (type) {
+                case 'hover':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                case 'click':
+                    oscillator.type = 'square';
+                    oscillator.frequency.value = 660;
+                    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'toggle':
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.setValueAtTime(330, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(660, audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+            }
+        }
+
+        // Dynamically create floating particles
+        function createParticles() {
+            const container = document.querySelector('.floating-particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                // Random properties
+                const size = Math.random() * 4 + 2;
+                const initialX = Math.random() * window.innerWidth;
+                const speed = Math.random() * 20 + 10;
+                const delay = Math.random() * 10;
+
+                // Apply styles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${initialX}px`;
+                particle.style.animationDuration = `${speed}s`;
+                particle.style.animationDelay = `${delay}s`;
+
+                container.appendChild(particle);
+            }
+        }
+
+        // Add card tilt effect with mouse movement
+        function addTiltEffect() {
+            const cards = document.querySelectorAll('.game-card');
+
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    // Calculate rotation based on mouse position
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+
+                    // Apply transform
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+
+                    // Move the shine effect
+                    const shine = card.querySelector('::after');
+                    if (shine) {
+                        const percentX = x / rect.width * 100;
+                        const percentY = y / rect.height * 100;
+                        shine.style.backgroundPosition = `${percentX}% ${percentY}%`;
+                    }
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                });
+            });
+        }
+
+        // Add interactive title glow effect
+        function addTitleGlowEffect() {
+            const title = document.querySelector('.arcade-title');
+            const titleGlow = document.querySelector('.title-glow');
+
+            document.addEventListener('mousemove', (e) => {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+
+                const offsetX = (x - 0.5) * 40;
+                const offsetY = (y - 0.5) * 20;
+
+                gsap.to(titleGlow, {
+                    x: offsetX,
+                    y: offsetY,
+                    duration: 0.5,
+                    ease: "power1.out"
+                });
+            });
+        }
+
+        // Add card hover animations
+        function enhanceCardEffects() {
+            const cards = document.querySelectorAll('.game-card');
+
+            cards.forEach(card => {
+                // Create a pulsing animation on the game icon
+                const icon = card.querySelector('.game-icon');
+                gsap.to(icon, {
+                    scale: 1.1,
+                    duration: 2,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                });
+
+                // Random subtle movement
+                gsap.to(card, {
+                    y: "random(-3, 3)",
+                    duration: "random(3, 5)",
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                });
+            });
+        }
+
+        // Add a scrolling effect for the grid background
+        function animateGridBackground() {
+            const gridBg = document.querySelector('.grid-bg');
+
+            gsap.to(gridBg, {
+                backgroundPosition: '0 100%',
+                duration: 20,
+                repeat: -1,
+                ease: "none"
+            });
+        }
+
+        // Add keyboard navigation
+        function addKeyboardNavigation() {
+            const cards = document.querySelectorAll('.game-card');
+            let focusedIndex = -1;
+
+            document.addEventListener('keydown', (e) => {
+                const cardsArray = Array.from(cards);
+                const columns = Math.floor(document.querySelector('.game-grid').clientWidth / cards[0].clientWidth);
+
+                switch (e.key) {
+                    case 'ArrowRight':
+                        focusedIndex = Math.min(focusedIndex + 1, cards.length - 1);
+                        break;
+                    case 'ArrowLeft':
+                        focusedIndex = Math.max(focusedIndex - 1, 0);
+                        break;
+                    case 'ArrowUp':
+                        focusedIndex = Math.max(focusedIndex - columns, 0);
+                        break;
+                    case 'ArrowDown':
+                        focusedIndex = Math.min(focusedIndex + columns, cards.length - 1);
+                        break;
+                    case 'Enter':
+                        if (focusedIndex >= 0) {
+                            cards[focusedIndex].querySelector('.game-link').click();
+                        }
+                        break;
+                    case 'Tab':
+                        if (e.shiftKey) {
+                            focusedIndex = Math.max(focusedIndex - 1, 0);
+                        } else {
+                            focusedIndex = Math.min(focusedIndex + 1, cards.length - 1);
+                        }
+                        e.preventDefault();
+                        break;
+                }
+
+                // Apply focus effect
+                if (focusedIndex >= 0) {
+                    cardsArray.forEach(card => card.classList.remove('focused'));
+                    cards[focusedIndex].classList.add('focused');
+                    cards[focusedIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+
+        // Handle window resize
+        function handleResize() {
+            window.addEventListener('resize', () => {
+                // Recalculate any dimension-dependent layouts
+                const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (!reducedMotion) {
+                    // Restart animations that depend on window size
+                    createParticles();
+                    addTiltEffect();
+                }
+            });
+        }
+
+        // Initialize all effects
+        function initEffects() {
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (!reducedMotion) {
+                addTiltEffect();
+                addTitleGlowEffect();
+                enhanceCardEffects();
+                animateGridBackground();
+                handleResize();
+            }
+
+            // These should work even with reduced motion
+            addKeyboardNavigation();
+        }
+
+        // Call this after the initial animations are complete
+        document.addEventListener('DOMContentLoaded', () => {
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (reducedMotion) {
+                // Skip loader for reduced motion
+                document.querySelector('.loader').style.display = 'none';
+                initializeElements();
+                initEffects();
+            }
+        });
+
+        // Add a scroll reveal effect
+        function addScrollReveal() {
+            const cards = document.querySelectorAll('.game-card');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        gsap.to(entry.target, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.6,
+                            ease: "power2.out"
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                observer.observe(card);
+            });
+        }
+
+        // Add Easter eggs
+        function addEasterEggs() {
+            // Konami code
+            const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+            let konamiIndex = 0;
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === konamiCode[konamiIndex]) {
+                    konamiIndex++;
+                    if (konamiIndex === konamiCode.length) {
+                        // Trigger easter egg
+                        activateSpecialMode();
+                        konamiIndex = 0;
+                    }
+                } else {
+                    konamiIndex = 0;
+                }
+            });
+        }
+
+        // Special mode activation
+        function activateSpecialMode() {
+            // Play special sound
+            playSound('toggle', 0.5);
+
+            // Flash the screen
+            const flashOverlay = document.createElement('div');
+            flashOverlay.style.position = 'fixed';
+            flashOverlay.style.top = '0';
+            flashOverlay.style.left = '0';
+            flashOverlay.style.width = '100%';
+            flashOverlay.style.height = '100%';
+            flashOverlay.style.backgroundColor = 'white';
+            flashOverlay.style.opacity = '0';
+            flashOverlay.style.pointerEvents = 'none';
+            flashOverlay.style.zIndex = '9999';
+            document.body.appendChild(flashOverlay);
+
+            gsap.to(flashOverlay, {
+                opacity: 0.8,
+                duration: 0.1,
+                repeat: 3,
+                yoyo: true,
+                onComplete: () => {
+                    document.body.removeChild(flashOverlay);
+                    applySpecialTheme();
+                }
+            });
+        }
+
+        // Apply a special theme as easter egg
+        function applySpecialTheme() {
+            // Change background color
+            document.body.style.background = 'linear-gradient(45deg, #ff00aa, #8a2be2)';
+
+            // Add floating game characters
+            const characters = ['👾', '🎮', '🕹️', '👻', '🤖', '🚀', '💥'];
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.width = '100%';
+            container.style.height = '100%';
+            container.style.pointerEvents = 'none';
+            container.style.zIndex = '-1';
+            document.body.appendChild(container);
+
+            for (let i = 0; i < 20; i++) {
+                const char = document.createElement('div');
+                char.textContent = characters[Math.floor(Math.random() * characters.length)];
+                char.style.position = 'absolute';
+                char.style.left = `${Math.random() * 100}%`;
+                char.style.top = `${Math.random() * 100}%`;
+                char.style.fontSize = `${Math.random() * 30 + 20}px`;
+                container.appendChild(char);
+
+                gsap.to(char, {
+                    y: -window.innerHeight,
+                    x: `random(-100, 100)`,
+                    rotation: `random(-360, 360)`,
+                    duration: `random(5, 15)`,
+                    ease: "power1.inOut",
+                    repeat: -1,
+                    delay: Math.random() * 5
+                });
+            }
+
+            // Add reset button
+            const resetButton = document.createElement('button');
+            resetButton.textContent = 'Reset Theme';
+            resetButton.style.position = 'fixed';
+            resetButton.style.bottom = '20px';
+            resetButton.style.left = '20px';
+            resetButton.style.zIndex = '1000';
+            resetButton.style.padding = '10px 20px';
+            resetButton.style.background = 'white';
+            resetButton.style.border = 'none';
+            resetButton.style.borderRadius = '5px';
+            resetButton.style.cursor = 'pointer';
+
+            resetButton.addEventListener('click', () => {
+                document.body.removeChild(container);
+                document.body.removeChild(resetButton);
+                document.body.style.background = '';
+                playSound('click', 0.3);
+            });
+
+            document.body.appendChild(resetButton);
+        }
+
+        // Call initEffects after elements are initialized
+        window.addEventListener('load', () => {
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                setTimeout(() => {
+                    initEffects();
+                    addScrollReveal();
+                    addEasterEggs();
+                }, 3000); // Wait for initial animations to complete
+            }
         });
     </script>
 </body>
